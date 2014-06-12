@@ -34,7 +34,7 @@ To use the API import the ``Picologic`` module.
 ```haskell
 import Picologic
 
-p, q :: Expr
+p, q, r :: Expr
 p = readExpr "~(A | B)"
 q = readExpr "(A | ~B | C) & (B | D | E) & (D | F)"
 r = readExpr "(φ <-> ψ)"
@@ -51,6 +51,22 @@ main = solveProp p >>= putStrLn . ppSolutions
 -- ¬A ¬B
 -- ¬A B
 -- A ¬B
+```
+
+The expression AST consists just of the logical connectives. 
+
+```haskell
+newtype Ident = Ident String
+  deriving (Eq, Ord, Show, Data, Typeable)
+
+data Expr
+  = Var       Ident      -- ^ Variable
+  | Neg       Expr       -- ^ Logical negation
+  | Conj      Expr Expr  -- ^ Logical conjunction
+  | Disj      Expr Expr  -- ^ Logical disjunction
+  | Iff       Expr Expr  -- ^ Logical biconditional
+  | Implies   Expr Expr  -- ^ Material implication
+  deriving (Eq, Ord, Show, Data, Typeable)
 ```
 
 To use the interactive shell when compiled with with ``-fshell`` invoke picologic at the shell.

@@ -2,7 +2,7 @@ module Main where
 
 import Picologic
 
-p, q :: Expr
+p, q, r :: Expr
 p = readExpr "~(A | B)"
 q = readExpr "(A | ~B | C) & (B | D | E) & (D | F)"
 r = readExpr "(φ <-> ψ)"
