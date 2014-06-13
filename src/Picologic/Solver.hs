@@ -3,11 +3,13 @@ module Picologic.Solver (
   clausesExpr,
 ) where
 
+import Debug.Trace
+
 import Picologic.AST
 import Picosat
 
 import Data.List
-import Data.Map as M
+import qualified Data.Map as M
 import Control.Monad.Writer
 
 data Clause
@@ -22,19 +24,19 @@ instance Show Clause where
 solveProp :: Expr -> IO Solutions
 solveProp p = solveAll cs >>= return . Solutions . fmap (backSubst vs')
   where
-    cs = fmap toInts $ execWriter $ clauses vs (cnf p)
+    cs = filter (not . null) $ fmap toInts $ execWriter $ clauses vs (cnf p)
     vs  = M.fromList $ zip vars [1..]
     vs' = M.fromList $ zip [1..] vars
     vars = variables (cnf p)
 
 -- | Yield the integer clauses given to the SAT solver.
 clausesExpr :: Expr -> [[Int]]
-clausesExpr p = fmap toInts $ execWriter $ clauses vs (cnf p)
+clausesExpr p = filter (not . null) $ fmap toInts $ execWriter $ clauses vs (cnf p)
   where
     vs = M.fromList $ zip vars [1..]
     vars = variables (cnf p)
 
-backSubst :: Map Int Ident -> Solution -> [Expr]
+backSubst :: M.Map Int Ident -> Solution -> [Expr]
 backSubst env (Solution xs) = fmap go xs
   where
     go x | x >= 0 = Var (env M.! x)
@@ -44,6 +46,7 @@ backSubst _ Unknown = []
 
 toInts :: Clause -> [Int]
 toInts (CL xs) = fmap (\(CV n) -> n) xs
+toInts (CV x) = [x]
 
 neg :: Clause -> Clause
 neg (CV n) = CV (-n)
@@ -64,10 +67,9 @@ clauses env ex = case ex of
   Conj e1 e2 -> do
     cs1 <- clauses env e1
     cs2 <- clauses env e2
-    tell [combine cs1 cs2]
-    return (combine cs1 cs2)
+    tell [cs1, cs2]
+    return (CL [])
   Disj e1 e2 -> do
     cs1 <- clauses env e1
     cs2 <- clauses env e2
-    tell [combine cs1 cs2]
     return (combine cs1 cs2)
