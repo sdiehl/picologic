@@ -20,7 +20,6 @@ import Data.Data
 import Data.Maybe
 import qualified Data.Map as M
 
-
 newtype Ident = Ident String
   deriving (Eq, Ord, Show, Data, Typeable)
 

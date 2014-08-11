@@ -3,8 +3,6 @@ module Picologic.Solver (
   clausesExpr,
 ) where
 
-import Debug.Trace
-
 import Picologic.AST
 import Picosat
 
