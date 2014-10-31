@@ -5,7 +5,7 @@
 cabal.mkDerivation (self: {
   pname = "picologic";
   version = "0.1";
-  sha256 = "05fc33fcfe311c1db655a6376a02eb1975954d6c8c17634a8e727c20149b5dd9";
+  sha256 = "40b8f3a30f200f956d967c4bfa8063cbaf9a9e1963c246cffcc79e8e5da29193";
   isLibrary = true;
   isExecutable = true;
   buildDepends = [ mtl parsec picosat ];
