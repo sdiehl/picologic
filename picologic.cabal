@@ -28,7 +28,8 @@ library
     Picologic,
     Picologic.Solver,
     Picologic.AST,
-    Picologic.Parser
+    Picologic.Parser,
+    Picologic.Pretty
   hs-source-dirs:      src
   other-extensions:    DeriveDataTypeable, BangPatterns
   build-depends:       
