@@ -1,6 +1,8 @@
 Picologic
 ---------
 
+[![Build Status](https://travis-ci.org/sdiehl/picologic.svg?branch=master)](https://travis-ci.org/sdiehl/picologic)
+
 Picologic is a lightweight library for working with symbolic logic expresisons. It is built against the
 picosat Haskell library which bundles the SAT solver with the Haskell package so no external solver or
 dependencies are neccessary.
