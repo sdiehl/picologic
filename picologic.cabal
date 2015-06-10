@@ -30,6 +30,8 @@ library
     Picologic.AST,
     Picologic.Parser,
     Picologic.Pretty
+  other-modules:
+    Picologic.Lexer
   hs-source-dirs:      src
   other-extensions:    DeriveDataTypeable, BangPatterns
   build-depends:       
