@@ -64,7 +64,7 @@ nnf ex = case ex of
   Neg (Neg e)           -> e
 
   Conj e1 e2            -> nnf e1 `Conj` nnf e2
-  Neg (Conj e1 e2)      -> nnf $ Neg e1 `Conj` Neg e2
+  Neg (Conj e1 e2)      -> nnf $ Neg e1 `Disj` Neg e2
 
   Disj e1 e2            -> nnf e1 `Disj` nnf e2
   Neg (Disj e1 e2)      -> nnf $ Neg e1 `Conj` Neg e2
