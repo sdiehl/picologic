@@ -1,6 +1,7 @@
 import Test.QuickCheck
 import Picologic.AST
 import qualified Data.Map as M
+import System.Exit (exitFailure)
 
 instance Arbitrary Expr where
   arbitrary =
@@ -39,7 +40,11 @@ test_nnf e = eval env e == eval env (nnf e)
 test_cnf :: Expr -> Bool
 test_cnf e = eval env e == eval env (cnf e)
 
-qc = quickCheckWith $ stdArgs { maxSuccess = 1000 }
+qc = verboseCheckWith (stdArgs { maxSuccess = 1000 })
+
+-- how to make an error fail a 'cabal test'?
+qcwf p = verboseCheckWith (stdArgs { maxSuccess = 1000 })
+         (whenFail exitFailure p)
 
 main =
   do putStrLn "nnf"
