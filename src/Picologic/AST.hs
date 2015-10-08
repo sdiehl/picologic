@@ -72,9 +72,9 @@ nnf ex = case ex of
   Implies e1 e2         -> nnf $ Neg e1 `Disj` e2
   Neg (Implies e1 e2)   -> nnf $ e1 `Conj` Neg e2
 
-  Iff e1 e2             -> let a = e1 `Conj` e2
-                               b = Neg e1 `Conj` Neg e2
-                               in nnf $ a `Disj` b
+  Iff e1 e2             -> let a = e1 `Disj` Neg e2
+                               b = Neg e1 `Disj` e2
+                               in nnf $ a `Conj` b
 
   Neg (Iff e1 e2)       -> let a = e1 `Disj` e2
                                b = Neg e1 `Disj` Neg e2
