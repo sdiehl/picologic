@@ -97,8 +97,8 @@ cnf = simp . cnf' . nnf
 -- | Remove tautologies.
 simp :: Expr -> Expr
 simp ex = case ex of
-  Disj e1 (Neg e2) | e1 == e2 -> e1
-  Disj (Neg e1) e2 | e1 == e2 -> e1
+  -- Disj e1 (Neg e2) | e1 == e2 -> True
+  -- Disj (Neg e1) e2 | e1 == e2 -> True
   Disj e1 e2 -> Disj (simp e1) (simp e2)
   Conj e1 e2       | e1 == e2 -> e1
                    | otherwise -> Conj (simp e1) (simp e2)
