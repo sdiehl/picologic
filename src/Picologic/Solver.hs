@@ -1,38 +1,67 @@
 module Picologic.Solver (
   solveProp,
-  clausesExpr,
+  solveCNF,
+  clausesExpr
 ) where
 
 import Picologic.AST
+import Picologic.Pretty
 import Picosat
 
 import Data.List
 import qualified Data.Map as M
 import Control.Monad.Writer
 
-data Clause
-  = CV Int       -- ^Clause variable ( a or -a )
-  | CL [Clause]  -- ^Set of clause under disjuntion
-
-instance Show Clause where
-  show (CV i) = show i
-  show (CL xs) = concat (intersperse " " (fmap show xs))
-
--- | Yield the soutions for an expressions using the PicosSAT solver.
+-- | Yield the solutions for an expression using the PicoSAT solver.
 solveProp :: Expr -> IO Solutions
-solveProp p = solveAll cs >>= return . Solutions . fmap (backSubst vs')
+solveProp p = solveCNF $ cnf p
+
+-- | Yield the solutions for an expression using the PicoSAT
+-- solver. The Expression must be in CNF form already.
+solveCNF :: Expr -> IO Solutions
+solveCNF p = do
+  solutions <- solveAll ds
+  return $ Solutions $ fmap (backSubst vs') solutions
   where
-    cs = filter (not . null) $ fmap toInts $ execWriter $ clauses vs (cnf p)
+    cs = clausesFromCNF p
+    ds = cnfToDimacs vs cs
     vs  = M.fromList $ zip vars [1..]
     vs' = M.fromList $ zip [1..] vars
-    vars = variables (cnf p)
+    vars = variables p
+
+clausesFromCNF :: Expr -> [[Expr]]
+clausesFromCNF p =
+  [ [ case lit of
+         v@(Var name) -> v
+         v@(Neg (Var name)) -> v
+         x -> error $ "input not in CNF: \n" ++ show p
+    | lit <- ors [clause] ]
+  | clause <- ands [p]]
+
+ands :: [Expr] -> [Expr]
+ands [] = []
+ands (Conj a b : xs) = ands [a] ++ ands [b] ++ ands xs
+ands (x:xs) = x : ands xs
+
+ors :: [Expr] -> [Expr]
+ors [] = []
+ors (Disj a b : xs) = ors [a] ++ ors [b] ++ ors xs
+ors (x:xs) = x : ors xs
+
+cnfToDimacs :: M.Map Ident Int -> [[Expr]] -> [[Int]]
+cnfToDimacs vs cs = map (map encode) cs
+  where encode (Var ident)       = vs M.! ident
+        encode (Neg (Var ident)) = negate $ vs M.! ident
+  
 
 -- | Yield the integer clauses given to the SAT solver.
 clausesExpr :: Expr -> [[Int]]
-clausesExpr p = filter (not . null) $ fmap toInts $ execWriter $ clauses vs (cnf p)
+clausesExpr p = ds
   where
-    vs = M.fromList $ zip vars [1..]
-    vars = variables (cnf p)
+    cs = clausesFromCNF p
+    vs  = M.fromList $ zip vars [1..]
+    vars = variables p
+    ds = cnfToDimacs vs cs
 
 backSubst :: M.Map Int Ident -> Solution -> [Expr]
 backSubst env (Solution xs) = fmap go xs
@@ -42,32 +71,3 @@ backSubst env (Solution xs) = fmap go xs
 backSubst _ Unsatisfiable = []
 backSubst _ Unknown = []
 
-toInts :: Clause -> [Int]
-toInts (CL xs) = fmap (\(CV n) -> n) xs
-toInts (CV x) = [x]
-
-neg :: Clause -> Clause
-neg (CV n) = CV (-n)
-neg (CL xs) = CL (fmap neg xs)
-
-combine :: Clause -> Clause -> Clause
-combine (CL x) (CL y) = CL (x++y)
-combine (CL x) y = combine (CL x) (CL [y])
-combine x (CL y) = combine (CL [x]) (CL y)
-combine x y = CL [x, y]
-
-clauses :: M.Map Ident Int -> Expr -> Writer [Clause] Clause
-clauses env ex = case ex of
-  Var v -> return $ CV (env M.! v)
-  Neg x -> do
-    cs <- clauses env x
-    return (neg cs)
-  Conj e1 e2 -> do
-    cs1 <- clauses env e1
-    cs2 <- clauses env e2
-    tell [cs1, cs2]
-    return (CL [])
-  Disj e1 e2 -> do
-    cs1 <- clauses env e1
-    cs2 <- clauses env e2
-    return (combine cs1 cs2)

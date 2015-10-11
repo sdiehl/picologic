@@ -29,7 +29,8 @@ library
     Picologic.Solver,
     Picologic.AST,
     Picologic.Parser,
-    Picologic.Pretty
+    Picologic.Pretty,
+    Picologic.Tseitin
   other-modules:
     Picologic.Lexer
   hs-source-dirs:      src
@@ -63,7 +64,14 @@ executable picologic
     buildable: False
 
 --Todo: how to fail 'cabal test' on a QuickCheck error?
---Test-Suite picologic-quickcheck
---    type:       exitcode-stdio-1.0
---    main-is:    tests/tests.hs
---    build-depends: base, QuickCheck, containers, picologic
+Test-Suite picologic-quickcheck
+   type:       exitcode-stdio-1.0
+   main-is:    tests.hs
+   hs-source-dirs: tests
+   build-depends: base, QuickCheck, containers, picosat, mtl, pretty, picologic
+
+Test-Suite pretty-print-test
+   type:       exitcode-stdio-1.0
+   main-is:    PrettyPrintTest.hs
+   hs-source-dirs: tests
+   build-depends: base, picologic
