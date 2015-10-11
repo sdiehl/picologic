@@ -1,6 +1,7 @@
 module Picologic.Solver (
   solveProp,
   solveCNF,
+  solveOneCNF,
   clausesExpr
 ) where
 
@@ -22,6 +23,19 @@ solveCNF :: Expr -> IO Solutions
 solveCNF p = do
   solutions <- solveAll ds
   return $ Solutions $ fmap (backSubst vs') solutions
+  where
+    cs = clausesFromCNF p
+    ds = cnfToDimacs vs cs
+    vs  = M.fromList $ zip vars [1..]
+    vs' = M.fromList $ zip [1..] vars
+    vars = variables p
+
+-- | Yield one single solution for an expression using the PicoSAT
+-- solver. The Expression must be in CNF form already.
+solveOneCNF :: Expr -> IO [Expr]
+solveOneCNF p = do
+  solution <- solve ds
+  return $ backSubst vs' solution
   where
     cs = clausesFromCNF p
     ds = cnfToDimacs vs cs

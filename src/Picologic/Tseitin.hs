@@ -10,6 +10,10 @@ module Picologic.Tseitin
 --       of one Tseitin var can be enough.
 -- TODO: The outermost (Conj (Conj ...) ...) needn't be
 --       Tseitin encoded at all.
+--       Also, the (Disj (Disj ...) ...) below, needn't be encoded
+--       when they use only variables or negated variables.
+--       Tseitin transformation can be used specifically there to
+--       turn other expressions into variables.
 
 import Prelude hiding (or, and)
 
