@@ -6,8 +6,10 @@ module Picologic.Tseitin
        ) where
 
 -- TODO: How efficient is the `mappend` used by Writer?
--- TODO: for cases like (Conj (Conj a b) c) the introduction
---   of one Tseitin var can be enough.
+-- TODO: For cases like (Conj (Conj a b) c) the introduction
+--       of one Tseitin var can be enough.
+-- TODO: The outermost (Conj (Conj ...) ...) needn't be
+--       Tseitin encoded at all.
 
 import Prelude hiding (or, and)
 
