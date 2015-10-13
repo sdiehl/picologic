@@ -1,5 +1,5 @@
 name:                picologic
-version:             0.1.1
+version:             0.1.2
 synopsis:            Utilities for symbolic predicate logic expressions
 homepage:            https://github.com/sdiehl/picologic
 license:             MIT
@@ -36,7 +36,7 @@ library
   hs-source-dirs:      src
   other-extensions:    DeriveDataTypeable, BangPatterns
   build-depends:       
-    base,
+    base >= 2   && <5,
     picosat,
     containers,
     mtl,
@@ -51,7 +51,7 @@ executable picologic
     other-modules: Picologic.Repl
     other-extensions:    DeriveDataTypeable, BangPatterns
     build-depends:       
-      base        >= 4.6 && <4.8,
+      base        >= 2   && <5,
       picosat     >= 0.1 && <0.2,
       containers  >= 0.5 && <0.6,
       mtl         >= 2.1 && <2.2,
@@ -68,10 +68,19 @@ Test-Suite picologic-quickcheck
    type:       exitcode-stdio-1.0
    main-is:    tests.hs
    hs-source-dirs: tests
-   build-depends: base, QuickCheck, containers, picosat, mtl, pretty, picologic
+   build-depends: 
+      base >= 2 && <5,
+      QuickCheck,
+      containers,
+      picosat,
+      mtl,
+      pretty,
+      picologic
 
 Test-Suite pretty-print-test
    type:       exitcode-stdio-1.0
    main-is:    PrettyPrintTest.hs
    hs-source-dirs: tests
-   build-depends: base, picologic
+   build-depends: 
+      base >= 2 && <5,
+      picologic
