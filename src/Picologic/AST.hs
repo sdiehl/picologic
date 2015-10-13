@@ -34,7 +34,7 @@ data Expr
   | Disj      Expr Expr  -- ^ Logical disjunction
   | Iff       Expr Expr  -- ^ Logical biconditional
   | Implies   Expr Expr  -- ^ Material implication
-  deriving (Eq, Ord, Show, Data, Typeable)
+  deriving (Eq, Ord, Data, Typeable)
 
 -- | Evaluate expression.
 eval :: Ctx -> Expr -> Bool
@@ -57,14 +57,15 @@ variables expr = map head . group . sort $ go expr []
     go (Implies e1 e2) !vs = go e1 vs ++ go e2 vs
 
 -- | Negation normal form.
+-- (May result in exponential growth)
 nnf :: Expr -> Expr
 nnf ex = case ex of
   e@(Var _)             -> e
   e@(Neg (Var _))       -> e
-  Neg (Neg e)           -> e
+  Neg (Neg e)           -> nnf e
 
   Conj e1 e2            -> nnf e1 `Conj` nnf e2
-  Neg (Conj e1 e2)      -> nnf $ Neg e1 `Conj` Neg e2
+  Neg (Conj e1 e2)      -> nnf $ Neg e1 `Disj` Neg e2
 
   Disj e1 e2            -> nnf e1 `Disj` nnf e2
   Neg (Disj e1 e2)      -> nnf $ Neg e1 `Conj` Neg e2
@@ -72,15 +73,16 @@ nnf ex = case ex of
   Implies e1 e2         -> nnf $ Neg e1 `Disj` e2
   Neg (Implies e1 e2)   -> nnf $ e1 `Conj` Neg e2
 
-  Iff e1 e2             -> let a = e1 `Conj` e2
-                               b = Neg e1 `Conj` Neg e2
-                               in nnf $ a `Disj` b
+  Iff e1 e2             -> let a = e1 `Disj` Neg e2
+                               b = Neg e1 `Disj` e2
+                               in nnf $ a `Conj` b
 
   Neg (Iff e1 e2)       -> let a = e1 `Disj` e2
                                b = Neg e1 `Disj` Neg e2
                                in nnf $ a `Conj` b
 
 -- | Conjunctive normal form.
+-- (May result in exponential growth)
 cnf :: Expr -> Expr
 cnf = simp . cnf' . nnf
   where
@@ -97,8 +99,8 @@ cnf = simp . cnf' . nnf
 -- | Remove tautologies.
 simp :: Expr -> Expr
 simp ex = case ex of
-  Disj e1 (Neg e2) | e1 == e2 -> e1
-  Disj (Neg e1) e2 | e1 == e2 -> e1
+  -- Disj e1 (Neg e2) | e1 == e2 -> True
+  -- Disj (Neg e1) e2 | e1 == e2 -> True
   Disj e1 e2 -> Disj (simp e1) (simp e2)
   Conj e1 e2       | e1 == e2 -> e1
                    | otherwise -> Conj (simp e1) (simp e2)

@@ -29,18 +29,19 @@ library
     Picologic.Solver,
     Picologic.AST,
     Picologic.Parser,
-    Picologic.Pretty
+    Picologic.Pretty,
+    Picologic.Tseitin
   other-modules:
     Picologic.Lexer
   hs-source-dirs:      src
   other-extensions:    DeriveDataTypeable, BangPatterns
   build-depends:       
-    base        >= 4.6 && <4.8,
-    picosat     >= 0.1 && <0.2,
-    containers  >= 0.5 && <0.6,
-    mtl         >= 2.1 && <2.2,
-    pretty      >= 1.1 && <1.2,
-    parsec      >= 3.1 && <3.2
+    base,
+    picosat,
+    containers,
+    mtl,
+    pretty,
+    parsec
   default-language:    Haskell2010
 
 executable picologic
@@ -61,3 +62,16 @@ executable picologic
     default-language:    Haskell2010
   else
     buildable: False
+
+--Todo: how to fail 'cabal test' on a QuickCheck error?
+Test-Suite picologic-quickcheck
+   type:       exitcode-stdio-1.0
+   main-is:    tests.hs
+   hs-source-dirs: tests
+   build-depends: base, QuickCheck, containers, picosat, mtl, pretty, picologic
+
+Test-Suite pretty-print-test
+   type:       exitcode-stdio-1.0
+   main-is:    PrettyPrintTest.hs
+   hs-source-dirs: tests
+   build-depends: base, picologic
