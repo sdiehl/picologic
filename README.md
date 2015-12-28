@@ -101,4 +101,4 @@ License
 -------
 
 Released under the MIT License.
-Copyright (c) 2014, Stephen Diehl
+Copyright (c) 2014-2016, Stephen Diehl
