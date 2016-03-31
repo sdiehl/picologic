@@ -68,6 +68,8 @@ data Expr
   | Disj      Expr Expr  -- ^ Logical disjunction
   | Iff       Expr Expr  -- ^ Logical biconditional
   | Implies   Expr Expr  -- ^ Material implication
+  | Top                  -- ^ Constant true
+  | Bottom               -- ^ Constant false
   deriving (Eq, Ord, Show, Data, Typeable)
 ```
 
