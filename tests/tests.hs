@@ -42,10 +42,11 @@ instance Arbitrary Expr where
   shrink Bottom = []
 
 
-env = M.fromList [(Ident "a", True),
-                  (Ident "b", True),
-                  (Ident "c", False),
-                  (Ident "d", False)]
+envl = [(Ident "a", True),
+        (Ident "b", True),
+        (Ident "c", False),
+        (Ident "d", False)]
+env = M.fromList envl
 
 test_nnf :: Expr -> Bool
 test_nnf e = eval env e == eval env (nnf e)
@@ -75,6 +76,15 @@ test_tseitin e = unsafePerformIO test
           return $ normalize as1 == normalize bs1
         normalize (Solutions ssv) = sort $ map sort ssv
 
+test_partEval :: Expr -> Bool
+test_partEval e = if eval env e
+                  then elast == Top
+                  else elast == Bottom
+  where
+    envs = map (\(i,v) -> M.singleton i v) envl
+    elast = last $ scanl (flip partEval) e envs
+
+
 qc = verboseCheckWith (stdArgs { maxSuccess = 2000 })
 
 -- how to make an error fail a 'cabal test'?
@@ -88,3 +98,5 @@ main = do
   qc test_cnf
   putStrLn "tseitin"
   qc test_tseitin
+  putStrLn "partEval"
+  qc test_partEval

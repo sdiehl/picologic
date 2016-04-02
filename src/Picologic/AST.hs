@@ -14,7 +14,9 @@ module Picologic.AST (
   nnf,
   simp,
   isConst,
-  propConst
+  propConst,
+  subst,
+  partEval
 ) where
 
 import Data.List
@@ -138,6 +140,19 @@ transformDown f ex = case f ex of
   Implies e1 e2 -> Implies (transformDown f e1) (transformDown f e2)
   e -> e
 
+-- | Convert expression to list of all subexpressions.
+toList :: Expr -> [Expr]
+-- TODO: This could probably be done with Data.Data, but it's outside my capabilities for now.
+toList ex = ex : case ex of
+  Var ident -> []
+  Neg e -> toList e
+  Conj e1 e2 -> toList e1 ++ toList e2
+  Disj e1 e2 -> toList e1 ++ toList e2
+  Iff e1 e2 -> toList e1 ++ toList e2
+  Implies e1 e2 -> toList e1 ++ toList e2
+  Top -> []
+  Bottom -> []
+
 -- | Propagate constants (to simplify expression).
 propConst :: Expr -> Expr
 propConst = transformUp propConst1
@@ -167,3 +182,17 @@ propConst1 ex = case ex of
   Implies e1 Top -> Top
   Implies e1 Bottom -> Neg e1
   e -> e
+
+-- | Substitute expressions for variables. This doesn't resolve any potential variable name conflicts.
+subst :: M.Map Ident Expr -> Expr -> Expr
+subst vs = transformUp (propConst1 . subst1 vs)
+  where
+    subst1 vs ex = case ex of
+      Var ident -> M.findWithDefault ex ident vs
+      e -> e
+
+-- | Partially evaluate expression.
+partEval :: Ctx -> Expr -> Expr
+partEval vs = subst (M.map constants vs)
+  where constants True = Top
+        constants False = Bottom
