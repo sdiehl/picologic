@@ -40,6 +40,7 @@ p, q, r :: Expr
 p = readExpr "~(A | B)"
 q = readExpr "(A | ~B | C) & (B | D | E) & (D | F)"
 r = readExpr "(φ <-> ψ)"
+s = readExpr "(0 | A) -> (A & 1)"
 
 ps = ppExprU p
 -- ¬(A ∨ B)
@@ -47,6 +48,10 @@ qs = ppExprU q
 -- ((((A ∨ ¬B) ∨ C) ∧ ((B ∨ D) ∨ E)) ∧ (D ∨ F))
 rs = ppExprU (cnf r)
 -- ((φ ∧ (φ ∨ ¬ψ)) ∧ ((ψ ∨ ¬φ) ∧ ψ))
+ss = ppExprU s
+-- ((⊥ ∨ A) → (A ∧ ⊤))
+ss1 = ppExprU (cnf s)
+-- ⊤
 
 main :: IO ()
 main = solveProp p >>= putStrLn . ppSolutions
@@ -55,7 +60,7 @@ main = solveProp p >>= putStrLn . ppSolutions
 -- A ¬B
 ```
 
-The expression AST consists just of the logical connectives. 
+The expression AST consists just of the logical connectives or constants. 
 
 ```haskell
 newtype Ident = Ident String
