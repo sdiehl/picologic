@@ -34,7 +34,7 @@ reservedOps = [
   ]
 
 reservedNames :: [String]
-reservedNames = []
+reservedNames = ["1","0"]
 
 lexerStyle :: Language
 lexerStyle = haskellStyle

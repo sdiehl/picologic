@@ -4,15 +4,15 @@ import Picologic.Solver
 import Picologic.Pretty
 
 import Test.QuickCheck
+import Data.List
 import qualified Data.Map as M
-import qualified Data.Set as S
 import System.Exit (exitFailure)
 import System.IO.Unsafe (unsafePerformIO)
 
 instance Arbitrary Expr where
   arbitrary = sized $ \n ->
                 tree (round $ sqrt $ fromIntegral n :: Int)
-    where tree 0 = elements $ map (Var . Ident) ["a", "b", "c", "d"]
+    where tree 0 = elements $ map (Var . Ident) (concat $ replicate 3 ["a", "b", "c", "d"]) ++ [Top, Bottom]
           tree n =
             oneof
             [do a <- tree (pred n)
@@ -38,12 +38,15 @@ instance Arbitrary Expr where
   shrink (Iff a b) = [a, b]
                      ++ map (Iff a) (shrink b)
                      ++ map (\aa-> Iff aa b) (shrink a)
+  shrink Top = []
+  shrink Bottom = []
 
 
-env = M.fromList [(Ident "a", True),
-                  (Ident "b", True),
-                  (Ident "c", False),
-                  (Ident "d", False)]
+envl = [(Ident "a", True),
+        (Ident "b", True),
+        (Ident "c", False),
+        (Ident "d", False)]
+env = M.fromList envl
 
 test_nnf :: Expr -> Bool
 test_nnf e = eval env e == eval env (nnf e)
@@ -54,6 +57,7 @@ test_cnf e = eval env e == eval env (cnf e)
 test_tseitin :: Expr -> Bool
 test_tseitin e = unsafePerformIO test
   where test = do
+          let vars = variables e
           let ts = tseitinCNF e
           -- putStrLn "\nexpr"
           -- print $ ppExprLisp e
@@ -61,16 +65,27 @@ test_tseitin e = unsafePerformIO test
           -- print $ ppExprLisp ts
           -- putStrLn "tseitin clauses"
           -- mapM_ print $ clausesExpr ts
-          as <- solveCNF $ cnf e
+          let ce = cnf e
+          as <- solveCNF ce
           bs0 <- solveCNF ts
           let bs =  dropTseitinVarsInSolutions bs0
-          case (as, bs) of
-            (Solutions av, Solutions bv) -> do
-              --print ("as", av)
-              --print ("bs", bv)
-              return $ S.fromList av == S.fromList bv
+          let as1 = addVarsToSolutions vars as
+          let bs1 = addVarsToSolutions vars bs
+          --print ("as", as)
+          --print ("bs", bs)
+          return $ normalize as1 == normalize bs1
+        normalize (Solutions ssv) = sort $ map sort ssv
 
-qc = verboseCheckWith (stdArgs { maxSuccess = 1000 })
+test_partEval :: Expr -> Bool
+test_partEval e = if eval env e
+                  then elast == Top
+                  else elast == Bottom
+  where
+    envs = map (\(i,v) -> M.singleton i v) envl
+    elast = last $ scanl (flip partEval) e envs
+
+
+qc = verboseCheckWith (stdArgs { maxSuccess = 2000 })
 
 -- how to make an error fail a 'cabal test'?
 qcwf p = verboseCheckWith (stdArgs { maxSuccess = 1000 })
@@ -83,3 +98,5 @@ main = do
   qc test_cnf
   putStrLn "tseitin"
   qc test_tseitin
+  putStrLn "partEval"
+  qc test_partEval

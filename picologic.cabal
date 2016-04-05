@@ -1,5 +1,5 @@
 name:                picologic
-version:             0.1.2
+version:             0.2.0
 synopsis:            Utilities for symbolic predicate logic expressions
 homepage:            https://github.com/sdiehl/picologic
 license:             MIT

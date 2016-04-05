@@ -32,11 +32,16 @@ var = do
   x <- identifier
   return $ Var (Ident x)
 
+constant :: Parser Expr
+constant = (reserved "1" >> return Top)
+       <|> (reserved "0" >> return Bottom)
+
 cexpr :: Parser Expr
 cexpr =  Ex.buildExpressionParser operators cfactor
 
 cfactor :: Parser Expr
-cfactor =  var
+cfactor =  constant
+       <|> var
        <|> parens cexpr
 
 parseExpr :: String -> Either ParseError Expr

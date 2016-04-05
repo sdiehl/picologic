@@ -5,9 +5,10 @@ module Picologic.Pretty (
   ppSolutions,
 ) where
 
-import Picologic.AST (Expr(..), Ident(..), Solutions(..))
+import Data.List (intersperse, intercalate)
 import Text.PrettyPrint
-import Data.List (intersperse)
+
+import Picologic.AST (Expr(..), Ident(..), Solutions(..))
 
 -- | Pretty print with unicode symbols.
 ppExprU :: Expr -> Doc
@@ -18,6 +19,8 @@ ppExprU ex = case ex of
   Disj a b      -> con '∨' a b
   Implies a b   -> con '→' a b
   Iff a b       -> con '↔' a b
+  Top           -> char '⊤'
+  Bottom        -> char '⊥'
   where con c a b =
           parens $ sep [ppExprU a, char c <+> ppExprU b]
 
@@ -30,6 +33,8 @@ ppExprA ex = case ex of
   Disj e1 e2     ->  parens $ ppExprA e1 <+> char '|' <+> ppExprA e2
   Implies e1 e2  ->  parens $ ppExprA e1 <+> text "->" <+> ppExprA e2
   Iff e1 e2      ->  parens $ ppExprA e1 <+> text "<->" <+> ppExprA e2
+  Top            ->  char '1'
+  Bottom         ->  char '0'
 
 -- | Pretty print into S-Expressions
 ppExprLisp :: Expr -> Doc
@@ -39,6 +44,8 @@ ppExprLisp ex = case ex of
   Disj a b            -> con "or" $ ors [a, b]
   Implies a b         -> con "==>" [a, b]
   Iff a b             -> con "==" $ iffs [a, b]
+  Top                 -> text "true"
+  Bottom              -> text "false"
   Neg (Var (Ident n)) -> text $ "-" ++ n
   Neg (Conj a b)      -> con "nand" $ ands [a, b]
   Neg (Disj a b)      -> con "nor" $ ors [a, b]
@@ -62,12 +69,14 @@ iffs (Iff a b : xs) = iffs [a] ++ iffs [b] ++ iffs xs
 iffs (x:xs) = x : iffs xs
 
 instance Show Expr where
-  show = show . ppExprLisp
-
+  show = show . ppExprA
 
 ppSolutions :: Solutions -> String
 ppSolutions (Solutions xs) =
-  concat (concat $ intersperse ["\n"] (fmap showExprs xs))
+  concat (intercalate ["\n"] (fmap showExprs xs))
+
+instance Show Solutions where
+  show (Solutions sols) = show sols
 
 showExprs :: [Expr] -> [String]
 showExprs xs = intersperse " " $ fmap (render . ppExprU) xs

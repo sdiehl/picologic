@@ -33,12 +33,12 @@ var = do
   put $ succ n
   return $ Var $ Ident $ "ts*" ++ show n
 
-or xs = foldl1 Disj xs
-and xs = foldl1 Conj xs
+or = foldl1 Disj
+and = foldl1 Conj
 
 tseitinCNF :: Expr -> Expr
 tseitinCNF e =
-  let (var, clauses) = evalTS $ tseitin $ simplify e
+  let (var, clauses) = evalTS $ tseitin $ propConst e
   in and (var : clauses)
 
 neg (Neg x) = x
@@ -156,6 +156,10 @@ tseitin (Neg x) = do
         or [a, c]]
   return c
 
+tseitin Top = return Top
+
+tseitin Bottom = return Bottom
+
 dropTseitinVarsInSolutions (Solutions xs) =
   Solutions $ map dropTseitinVars xs
 
@@ -171,12 +175,3 @@ isTseitinLiteral lit =
 tseitinName ('t':'s':'*':_) = True
 tseitinName _               = False
 
-simplify :: Expr -> Expr
-simplify (Neg (Neg x)) = simplify x
-simplify v@(Var _) = v
-simplify (Neg a) = neg $ simplify a
-simplify (Conj a b) = Conj (simplify a) (simplify b)
-simplify (Disj a b) = Disj (simplify a) (simplify b)
-simplify (Implies a b) = Implies (simplify a) (simplify b)
-simplify (Iff a b) = Iff (simplify a) (simplify b)
-                        
