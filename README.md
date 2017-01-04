@@ -3,27 +3,37 @@ Picologic
 
 [![Build Status](https://travis-ci.org/sdiehl/picologic.svg?branch=master)](https://travis-ci.org/sdiehl/picologic)
 
-Picologic is a lightweight library for working with symbolic logic expresisons. It is built against the
-picosat Haskell library which bundles the SAT solver with the Haskell package so no external solver or
-dependencies are neccessary.
+Picologic is a lightweight library for working with symbolic logic expressions.
+It is built against the picosat Haskell library which bundles the SAT solver
+with the Haskell package so no external solver or dependencies are necessary.
 
-Picologic provides the logic expressions, parser and normal form conversion functions to express the logic
-expressions more naturally and then feed them to the SAT solver.
+Picologic provides the logic expressions, parser and normal form conversion
+functions to express the logic expressions more naturally and then feed them to
+the SAT solver.
 
 Installing
 ----------
 
-To install just the library:
+To use the library using Stack use:
+
+```bash
+$ git clone git@github.com:sdiehl/picologic.git
+$ cd picologic
+$ stack build
+$ stack test
+```
+
+Or using Cabal:
 
 ```bash
 $ cabal install picologic
 ```
 
-To build the interactive shell use:
+To build the interactive shell compile with the ``-fshell``  flag:
 
 ```bash
 $ cabal get picologic
-$ cd picologic-0.1
+$ cd picologic-0.2.0
 $ cabal configure -fshell
 $ cabal install
 ```
@@ -78,7 +88,8 @@ data Expr
   deriving (Eq, Ord, Show, Data, Typeable)
 ```
 
-To use the interactive shell when compiled with with ``-fshell`` invoke picologic at the shell.
+To use the interactive shell when compiled with with ``-fshell`` invoke
+picologic at the shell.
 
 ```bash
 $ picologic
@@ -108,4 +119,4 @@ License
 -------
 
 Released under the MIT License.
-Copyright (c) 2014-2016, Stephen Diehl
+Copyright (c) 2014-2017, Stephen Diehl
