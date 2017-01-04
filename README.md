@@ -89,7 +89,7 @@ data Expr
 ```
 
 To use the interactive shell when compiled with with ``-fshell`` invoke
-picologic at the shell.
+`picologic` at the shell.
 
 ```bash
 $ picologic
