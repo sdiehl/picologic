@@ -5,6 +5,7 @@ module Picologic.Pretty (
   ppSolutions,
 ) where
 
+import Prelude hiding ((<>))
 import Data.List (intersperse, intercalate)
 import Text.PrettyPrint
 

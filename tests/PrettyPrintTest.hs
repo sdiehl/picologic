@@ -1,5 +1,6 @@
 import Picologic
 
+main :: IO ()
 main = print $ ppExprLisp d
   where a =
           Disj (Var (Ident "some-var"))
@@ -7,7 +8,7 @@ main = print $ ppExprLisp d
                      (Iff (Var (Ident "ggg"))
                           (Neg (Iff (Neg (Var (Ident "var-x")))
                                     (Var (Ident "origin"))))))
-        b = 
+        b =
           Conj (Var (Ident "var-y"))
                (Conj (Var (Ident "ccc"))
                      (Iff (Var (Ident "ddddd"))
