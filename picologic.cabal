@@ -1,88 +1,100 @@
-name:                picologic
-version:             0.3.0
-synopsis:            Utilities for symbolic predicate logic expressions
-homepage:            https://github.com/sdiehl/picologic
-license:             MIT
-license-file:        LICENSE
-author:              Stephen Diehl
-maintainer:          stephen.m.diehl@gmail.com
-copyright:           2014-2020 Stephen Diehl
-category:            Logic
-build-type:          Simple
-cabal-version:       >=1.10
-tested-with:         GHC == 7.6.3
-Bug-Reports:         https://github.com/sdiehl/picologic/issues
-
+name:          picologic
+version:       0.3.0
+synopsis:      Utilities for symbolic predicate logic expressions
+homepage:      https://github.com/sdiehl/picologic
+license:       MIT
+license-file:  LICENSE
+author:        Stephen Diehl
+maintainer:    stephen.m.diehl@gmail.com
+copyright:     2014-2020 Stephen Diehl
+category:      Logic
+build-type:    Simple
+cabal-version: >=1.10
+tested-with:   GHC ==7.6.3 || ==8.10.1
+bug-reports:   https://github.com/sdiehl/picologic/issues
 description:
   `picologic` provides symbolic logic expressions that can be integrated with the `picosat` solver.
-Source-Repository head
-    type: git
-    location: git@github.com:sdiehl/picologic.git
 
-Flag shell
+source-repository head
+  type:     git
+  location: git@github.com:sdiehl/picologic.git
+
+flag shell
   description: Build the interactive shell
   default:     False
 
 library
-  exposed-modules:     
-    Picologic,
-    Picologic.Solver,
-    Picologic.AST,
-    Picologic.Parser,
-    Picologic.Pretty,
+  exposed-modules:
+    Picologic
+    Picologic.AST
+    Picologic.Parser
+    Picologic.Pretty
+    Picologic.Solver
     Picologic.Tseitin
-  other-modules:
-    Picologic.Lexer
-  hs-source-dirs:      src
-  other-extensions:    DeriveDataTypeable, BangPatterns
-  build-depends:       
-    base        >= 4.6 && <5,
-    picosat     >= 0.1 && <0.2,
-    containers  >= 0.5 && <0.7,
-    mtl         >= 2.1 && <2.4,
-    pretty      >= 1.1 && <1.2,
-    parsec      >= 3.1 && <3.2
-  default-language:    Haskell2010
+
+  other-modules:    Picologic.Lexer
+  default-language: Haskell2010
+  hs-source-dirs:   src
+  other-extensions:
+    BangPatterns
+    DeriveDataTypeable
+
+  build-depends:
+      base        >=4.6 && <5
+    , containers  >=0.5 && <0.7
+    , mtl         >=2.1 && <2.4
+    , parsec      >=3.1 && <3.2
+    , picosat     >=0.1 && <0.2
+    , pretty      >=1.1 && <1.2
 
 executable picologic
-  main-is:     Picologic/Main.hs
+  main-is:          Picologic/Main.hs
+  default-language: Haskell2010
+
   if flag(shell)
-    hs-source-dirs:      src
-    other-modules: Picologic.Repl
-    other-extensions:    DeriveDataTypeable, BangPatterns
-    build-depends:       
-      base        >= 2   && <5,
-      picosat     >= 0.1 && <0.2,
-      containers  >= 0.5 && <0.7,
-      mtl         >= 2.1 && <2.4,
-      pretty      >= 1.1 && <1.2,
-      parsec      >= 3.1 && <3.2,
-      process     >= 1.1 && <1.2,
-      haskeline   >= 0.7 && <0.8
-    default-language:    Haskell2010
+    hs-source-dirs:   src
+    other-modules:    Picologic.Repl
+    other-extensions:
+      BangPatterns
+      DeriveDataTypeable
+
+    build-depends:
+        base        >=2   && <5
+      , containers  >=0.5 && <0.7
+      , haskeline   >=0.7 && <0.8
+      , mtl         >=2.1 && <2.4
+      , parsec      >=3.1 && <3.2
+      , picosat     >=0.1 && <0.2
+      , pretty      >=1.1 && <1.2
+      , process     >=1.1 && <1.2
+
+    default-language: Haskell2010
+
   else
     buildable: False
 
 --Todo: how to fail 'cabal test' on a QuickCheck error?
-Test-Suite picologic-quickcheck
-   type:       exitcode-stdio-1.0
-   main-is:    Test.hs
-   hs-source-dirs: tests
-   build-depends: 
-      base >= 2 && <5,
-      tasty,
-      tasty-quickcheck,
-      QuickCheck,
-      containers,
-      picosat,
-      mtl,
-      pretty,
-      picologic
+test-suite picologic-quickcheck
+  default-language: Haskell2010
+  type:             exitcode-stdio-1.0
+  main-is:          Test.hs
+  hs-source-dirs:   tests
+  build-depends:
+      base              >=2 && <5
+    , containers
+    , mtl
+    , picologic
+    , picosat
+    , pretty
+    , QuickCheck
+    , tasty
+    , tasty-quickcheck
 
-Test-Suite pretty-print-test
-   type:       exitcode-stdio-1.0
-   main-is:    PrettyPrintTest.hs
-   hs-source-dirs: tests
-   build-depends: 
-      base >= 2 && <5,
-      picologic
+test-suite pretty-print-test
+  default-language: Haskell2010
+  type:             exitcode-stdio-1.0
+  main-is:          PrettyPrintTest.hs
+  hs-source-dirs:   tests
+  build-depends:
+      base       >=2 && <5
+    , picologic
