@@ -78,7 +78,7 @@ cnfToDimacs :: M.Map Ident Int -> [[Expr]] -> [[Int]]
 cnfToDimacs vs = map (map encode)
   where encode (Var ident)       = vs M.! ident
         encode (Neg (Var ident)) = negate $ vs M.! ident
-  
+
 
 -- | Yield the integer clauses given to the SAT solver.
 clausesExpr :: Expr -> [[Int]]

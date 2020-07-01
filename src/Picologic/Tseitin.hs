@@ -2,7 +2,7 @@ module Picologic.Tseitin
        (tseitinCNF,
         dropTseitinVarsInSolutions,
         dropTseitinVars,
-        
+
        ) where
 
 -- TODO: How efficient is the `mappend` used by Writer?
@@ -24,7 +24,7 @@ import Control.Monad.Writer.Strict
 type TS a = StateT Int (Writer [Expr]) a
 
 evalTS :: TS a -> (a, [Expr])
-evalTS action = 
+evalTS action =
   runWriter (evalStateT action 1)
 
 var :: TS Expr
@@ -174,4 +174,3 @@ isTseitinLiteral lit =
 
 tseitinName ('t':'s':'*':_) = True
 tseitinName _               = False
-

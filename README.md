@@ -7,9 +7,9 @@ Picologic is a lightweight library for working with symbolic logic expressions.
 It is built against the picosat Haskell library which bundles the SAT solver
 with the Haskell package so no external solver or dependencies are necessary.
 
-Picologic provides the logic expressions, parser and normal form conversion
-functions to express the logic expressions more naturally and then feed them to
-the SAT solver.
+Picologic provides the logic expressions, parser and normal form conversion, and
+Tseytin transformations to express the logic expressions in equational form and
+generate constraint sets for use in SAT/SMT solvers.
 
 Installing
 ----------
@@ -119,4 +119,4 @@ License
 -------
 
 Released under the MIT License.
-Copyright (c) 2014-2017, Stephen Diehl
+Copyright (c) 2014-2020, Stephen Diehl
